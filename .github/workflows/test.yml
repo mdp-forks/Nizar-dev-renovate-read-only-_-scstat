@@ -1,0 +1,54 @@
+# .github/workflows/your-workflow-file.yml
+
+name: Your Workflow Name
+
+on:
+  push:
+    branches:
+      - main
+    pull_request:
+      branches: 
+      - main
+
+jobs:
+  your-job:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Perform the check
+      run: echo "Performing the check..."
+
+    - name: Report the status
+      run: |
+        python3 -c "
+import requests
+
+access_token = 'your_access_token_here'
+owner = 'wss-qa'
+repo = 'scstat'
+sha = '${{ github.sha }}'
+state = 'success'
+target_url = 'https://example.com/status'
+description = 'The check passed'
+context = 'continuous-integration/check-name'
+
+headers = {
+    'Authorization': 'Token ' + access_token,
+    'Accept': 'application/vnd.github+json'
+}
+
+data = {
+    'state': state,
+    'target_url': target_url,
+    'description': description,
+    'context': context
+}
+
+response = requests.post(
+    f'https://api.github.com/repos/{owner}/{repo}/statuses/{sha}',
+    headers=headers,
+    json=data
+)
+
+print(response.json())
+        "
